@@ -1,193 +1,230 @@
-# Kubernetes Learning Project
+# 🚀 Kubernetes Learning Project
 
-Проект для изучения Kubernetes с настроенным мониторингом стеком (Prometheus, Grafana, Alertmanager).
+[![Kubernetes](https://img.shields.io/badge/Kubernetes-v1.34-blue?style=flat&logo=kubernetes)](https://kubernetes.io/)
+[![Prometheus](https://img.shields.io/badge/Prometheus-Monitoring-orange?style=flat&logo=prometheus)](https://prometheus.io/)
+[![Grafana](https://img.shields.io/badge/Grafana-Visualization-yellow?style=flat&logo=grafana)](https://grafana.com/)
+[![License](https://img.shields.io/badge/License-MIT-green?style=flat)](LICENSE)
 
-## Структура проекта
+Комплексный проект для изучения Kubernetes с полным мониторинг стеком и подробными обучающими материалами.
 
-```
-kubernetes-learning/
-├── docs/                              # Документация
-│   ├── current-architecture.md        # Текущая архитектура кластера
-│   ├── architecture-diagram.md        # Диаграммы архитектуры  
-│   └── component-dependencies.md      # Зависимости компонентов
-├── manifests/                         # Kubernetes манифесты
-│   ├── monitoring/                    # Мониторинг ресурсы
-│   │   ├── services.yaml             # Экспортированные сервисы
-│   │   └── workloads.yaml            # Deployments, StatefulSets, etc.
-│   ├── ingress/                      # Ingress правила
-│   │   └── grafana-ingress.yaml      # Текущий Ingress для Grafana
-│   └── apps/                         # Пользовательские приложения
-├── helm-values/                       # Helm значения
-│   ├── prometheus-values.yaml         # Текущие значения
-│   └── custom-prometheus-values.yaml  # Улучшенные значения
-└── scripts/                          # Скрипты автоматизации
-    ├── deploy-monitoring.sh          # Развертывание мониторинга
-    ├── setup-dns.sh                 # Настройка /etc/hosts
-    └── cluster-info.sh               # Информация о кластере
-```
+![Kubernetes Architecture](https://kubernetes.io/images/docs/components-of-kubernetes.svg)
 
-## Быстрый старт
+## 🎯 Что включено
+
+### 📚 Обучающие материалы
+- **3 подробных урока** от базовых концепций до продвинутых тем
+- **Практические упражнения** с реальными примерами
+- **Руководство по диагностике** и устранению проблем
+- **Архитектурная документация** с диаграммами
+
+### 🛠️ Готовая инфраструктура
+- **Prometheus** - сбор и хранение метрик
+- **Grafana** - визуализация и дашборды  
+- **Alertmanager** - управление алертами
+- **Nginx Ingress** - маршрутизация трафика
+- **SSL/TLS** - безопасные соединения
+
+### 🔧 Автоматизация
+- Скрипты развертывания и настройки
+- Диагностические утилиты
+- Примеры кастомных метрик и алертов
+
+## 🚀 Быстрый старт
 
 ### Предварительные требования
 
-- Minikube установлен и запущен
-- kubectl настроен для работы с кластером  
-- Helm 3.x установлен
+```bash
+# Ubuntu/Debian
+sudo apt-get update
+sudo apt-get install -y docker.io kubectl
 
-### Установка улучшенного мониторинга
+# Установка Minikube
+curl -LO https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64
+sudo install minikube-linux-amd64 /usr/local/bin/minikube
 
-1. **Развертывание мониторинга с Ingress:**
-   ```bash
-   cd scripts
-   ./deploy-monitoring.sh
-   ```
+# Установка Helm
+curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
+```
 
-2. **Настройка DNS для локального доступа:**
-   ```bash
-   ./setup-dns.sh
-   ```
+### Развертывание
 
-3. **Проверка статуса:**
-   ```bash
-   ./cluster-info.sh
-   ```
+```bash
+# 1. Клонирование репозитория
+git clone https://github.com/ReanorMax/Kuber.git
+cd Kuber
+
+# 2. Запуск Minikube кластера
+minikube start --memory=4096 --cpus=2
+
+# 3. Развертывание мониторинга
+./scripts/deploy-monitoring.sh
+
+# 4. Настройка DNS
+./scripts/setup-dns.sh
+
+# 5. Установка примеров
+./scripts/setup-monitoring-examples.sh
+```
 
 ### Доступ к сервисам
 
-После настройки будут доступны следующие сервисы:
+После настройки будут доступны:
 
-- **Grafana**: http://grafana.local (admin/admin123)
-- **Prometheus**: http://prometheus.local  
-- **Alertmanager**: http://alertmanager.local
+- 📊 **Grafana**: https://grafana.local (admin/admin123)
+- 📈 **Prometheus**: https://prometheus.local  
+- 🚨 **Alertmanager**: https://alertmanager.local
+- 🎯 **Example App**: http://metrics-app.local
 
-Альтернативные способы доступа:
-- Grafana через NodePort: http://$(minikube ip):31282
-- Port-forward: `kubectl port-forward -n monitoring svc/prometheus-grafana 3000:80`
+## 📖 Обучающие материалы
 
-## Текущая архитектура
+### 📘 Урок 1: Основы Kubernetes
+**Файл**: [`docs/learning-guide-01-basics.md`](docs/learning-guide-01-basics.md)
 
-### Компоненты кластера
-- **Кластер**: Minikube v1.34.0 (single-node)
-- **Мониторинг**: kube-prometheus-stack через Helm
-- **Ingress**: Nginx Ingress Controller
-- **Доступ**: Ingress + NodePort + port-forward
+Изучите:
+- Основные объекты Kubernetes (Pods, Deployments, Services)
+- Взаимодействие компонентов
+- Практические упражнения с kubectl
+- Создание собственного приложения
 
-### Namespace организация
-- `monitoring` - Prometheus, Grafana, Alertmanager
-- `ingress-nginx` - Nginx Ingress Controller  
-- `kube-system` - Системные компоненты Kubernetes
+### 📗 Урок 2: Сети и мониторинг  
+**Файл**: [`docs/learning-guide-02-networking-monitoring.md`](docs/learning-guide-02-networking-monitoring.md)
 
-## План обучения
+Изучите:
+- Сетевая модель Kubernetes
+- Service Discovery и DNS
+- Архитектура Prometheus
+- Создание дашбордов в Grafana
 
-### Фаза 1: Основы ✅
-- [x] Анализ текущей архитектуры
-- [x] Экспорт конфигураций
-- [ ] Настройка постоянного доступа через Ingress
+### 📙 Урок 3: Продвинутые темы
+**Файл**: [`docs/learning-guide-03-advanced-topics.md`](docs/learning-guide-03-advanced-topics.md)
 
-### Фаза 2: Углубленное изучение
-- [ ] Kubernetes объекты (Pods, Deployments, Services)
-- [ ] Сетевая модель и Service Discovery
-- [ ] ConfigMaps и Secrets
-- [ ] PersistentVolumes и Storage
+Изучите:
+- StatefulSets и Persistent Storage
+- RBAC и безопасность
+- Автоскейлинг (HPA/VPA)
+- Network Policies
 
-### Фаза 3: Мониторинг и наблюдаемость  
-- [ ] Prometheus архитектура и PromQL
-- [ ] Создание кастомных дашбордов Grafana
-- [ ] Настройка алертов в Alertmanager
-- [ ] Добавление кастомных метрик
+### 🔧 Диагностика и troubleshooting
+**Файл**: [`docs/troubleshooting-guide.md`](docs/troubleshooting-guide.md)
 
-### Фаза 4: Продвинутые темы
+Научитесь:
+- Диагностировать проблемы кластера
+- Анализировать логи и события
+- Отлаживать сетевые проблемы
+- Использовать инструменты мониторинга
+
+## 🏗️ Архитектура проекта
+
+```
+kubernetes-learning/
+├── 📚 docs/                     # Обучающие материалы
+│   ├── current-architecture.md   # Документация архитектуры
+│   ├── learning-guide-01-*.md    # Уроки по Kubernetes
+│   └── troubleshooting-guide.md  # Руководство по диагностике
+├── 📦 manifests/                # Kubernetes манифесты
+│   ├── monitoring/              # Prometheus stack
+│   ├── ingress/                 # Ingress правила
+│   └── apps/                    # Примеры приложений
+├── ⚙️ helm-values/               # Helm конфигурации
+├── 🛠️ scripts/                  # Скрипты автоматизации
+│   ├── deploy-monitoring.sh     # Развертывание мониторинга
+│   ├── setup-dns.sh            # Настройка DNS
+│   └── diagnose-*.sh           # Диагностические скрипты
+└── 📋 README.md                 # Основная документация
+```
+
+## 🎓 План обучения
+
+### 🌟 Фаза 1: Основы (1-2 недели)
+- [ ] Изучение архитектуры Kubernetes
+- [ ] Работа с основными объектами
+- [ ] Практика с kubectl
+- [ ] Развертывание первого приложения
+
+### 🚀 Фаза 2: Сети и мониторинг (2-3 недели)  
+- [ ] Понимание сетевой модели
+- [ ] Настройка Service Discovery
+- [ ] Изучение Prometheus и PromQL
+- [ ] Создание дашбордов Grafana
+
+### 🔥 Фаза 3: Продвинутые темы (3-4 недели)
+- [ ] StatefulSets и хранилище данных
 - [ ] RBAC и безопасность
-- [ ] Network Policies
-- [ ] Horizontal Pod Autoscaler
-- [ ] Переход на multi-node кластер
+- [ ] Автоскейлинг приложений
+- [ ] Диагностика и troubleshooting
 
-## Полезные команды
+## 📊 Примеры дашбордов
 
-### Мониторинг кластера
+В проекте включены готовые дашборды Grafana:
+
+- **Kubernetes Cluster Overview** - общий обзор кластера
+- **Application Monitoring** - мониторинг приложений  
+- **Learning Dashboard** - базовые примеры PromQL
+- **Monitoring Stack Health** - состояние мониторинга
+
+## 🔍 Диагностические инструменты
+
 ```bash
-# Статус всех ресурсов
+# Общая диагностика кластера
+./scripts/diagnose-cluster.sh
+
+# Диагностика конкретного приложения
+./scripts/diagnose-app.sh <app-name> [namespace]
+
+# Информация о кластере
+./scripts/cluster-info.sh
+```
+
+## 🛡️ Безопасность
+
+Проект включает:
+- SSL/TLS сертификаты для всех сервисов
+- Базовые настройки RBAC
+- Примеры Network Policies
+- `.gitignore` для исключения чувствительных данных
+
+## 🤝 Участие в проекте
+
+Проект создан для обучения. Вы можете:
+
+1. **Fork** репозиторий
+2. Добавить свои **примеры и упражнения**  
+3. Улучшить **документацию**
+4. Поделиться **опытом** в Issues
+
+## 📝 Полезные команды
+
+```bash
+# Проверка статуса всех сервисов
 kubectl get all -A
 
-# Поды в мониторинге  
-kubectl get pods -n monitoring
+# Просмотр метрик (если metrics-server установлен)
+kubectl top nodes
+kubectl top pods -A
 
-# Логи Grafana
-kubectl logs -n monitoring deployment/prometheus-grafana -f
-
-# Helm релизы
-helm list -A
-```
-
-### Отладка сети
-```bash
-# Ingress правила
+# Проверка Ingress
 kubectl get ingress -A
 
-# Сервисы и их endpoints
-kubectl get svc,endpoints -n monitoring
-
-# События кластера
-kubectl get events --sort-by='.lastTimestamp'
+# Логи мониторинга
+kubectl logs -n monitoring deployment/prometheus-grafana -f
 ```
 
-### Прямой доступ (port-forward)
-```bash
-# Grafana
-kubectl port-forward -n monitoring svc/prometheus-grafana 3000:80
+## 🔗 Полезные ссылки
 
-# Prometheus  
-kubectl port-forward -n monitoring svc/prometheus-kube-prometheus-prometheus 9090:9090
-
-# Alertmanager
-kubectl port-forward -n monitoring svc/prometheus-kube-prometheus-alertmanager 9093:9093
-```
-
-## Troubleshooting
-
-### Проблемы с доступом через Ingress
-1. Проверить статус Ingress Controller:
-   ```bash
-   kubectl get pods -n ingress-nginx
-   ```
-
-2. Проверить DNS записи в /etc/hosts:
-   ```bash
-   cat /etc/hosts | grep local
-   ```
-
-3. Проверить правила Ingress:
-   ```bash
-   kubectl describe ingress -n monitoring
-   ```
-
-### Проблемы с Prometheus
-1. Проверить статус подов:
-   ```bash
-   kubectl get pods -n monitoring | grep prometheus
-   ```
-
-2. Проверить логи:
-   ```bash
-   kubectl logs -n monitoring statefulset/prometheus-prometheus-kube-prometheus-prometheus
-   ```
-
-### Восстановление /etc/hosts
-```bash
-sudo mv /etc/hosts.backup.* /etc/hosts
-```
-
-## Следующие шаги
-
-1. **Настроить SSL/TLS** для Ingress правил
-2. **Добавить кастомные метрики** и ServiceMonitors  
-3. **Создать алерты** и правила в Alertmanager
-4. **Развернуть пример приложения** с мониторингом
-5. **Изучить RBAC** и настройки безопасности
-
-## Ресурсы для изучения
-
-- [Kubernetes Documentation](https://kubernetes.io/docs/)
+- [Официальная документация Kubernetes](https://kubernetes.io/docs/)
 - [Prometheus Documentation](https://prometheus.io/docs/)
-- [Grafana Documentation](https://grafana.com/docs/)
-- [Helm Documentation](https://helm.sh/docs/)
+- [Grafana Tutorials](https://grafana.com/tutorials/)
+- [Helm Charts](https://helm.sh/docs/)
+
+## 📞 Поддержка
+
+Если у вас есть вопросы или предложения:
+- Создайте **Issue** в репозитории
+- Изучите документацию в папке `docs/`
+- Используйте скрипты диагностики
+
+---
+
+**🌟 Звезды приветствуются! Поделитесь проектом с коллегами изучающими Kubernetes.**
+
+**📚 Хорошего изучения Kubernetes!**

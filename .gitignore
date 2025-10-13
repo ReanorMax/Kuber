@@ -43,3 +43,4 @@ diagnostic-reports/
 
 # Временные скрипты
 temp-*.sh
+.github-auth-help.md
