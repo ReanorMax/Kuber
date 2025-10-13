@@ -37,6 +37,14 @@
   - Практические примеры
   - ➡️ **Читать после**: [Урок 1](learning-guide-01-basics.md)
 
+- [configmaps-explained.md](configmaps-explained.md) - **ConfigMaps: конфигурация в Kubernetes** ⭐
+  - Что такое ConfigMap?
+  - Почему их так много (54 штуки!)
+  - Как система понимает куда их "тащить"
+  - Готовые конфиги vs ручные
+  - ConfigMap vs Secret
+  - ➡️ **Читать после**: [Урок 1](learning-guide-01-basics.md)
+
 - [prometheus-stack-components.md](prometheus-stack-components.md) - **Prometheus Stack: все 6 компонентов**
   - Prometheus Server - сбор метрик
   - Alertmanager - управление алертами
