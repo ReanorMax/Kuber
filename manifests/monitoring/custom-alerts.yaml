@@ -1,0 +1,198 @@
+# Кастомные алерты для мониторинга приложений
+
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: custom-application-alerts
+  namespace: monitoring
+  labels:
+    app: custom-alerts
+    # ВАЖНО: labels для discovery Prometheus'ом
+    prometheus: kube-prometheus
+    role: alert-rules
+spec:
+  groups:
+  
+  # Группа алертов для приложений
+  - name: application.rules
+    interval: 30s
+    rules:
+    
+    # Алерт на высокое потребление CPU
+    - alert: HighCPUUsage
+      expr: |
+        (
+          sum(rate(container_cpu_usage_seconds_total{container!="",container!="POD"}[5m])) by (pod, namespace)
+          /
+          sum(container_spec_cpu_quota{container!="",container!="POD"}/container_spec_cpu_period{container!="",container!="POD"}) by (pod, namespace)
+        ) * 100 > 80
+      for: 5m
+      labels:
+        severity: warning
+        component: kubernetes
+      annotations:
+        summary: "Высокое потребление CPU в Pod'е {{ $labels.pod }}"
+        description: |
+          Pod {{ $labels.pod }} в namespace {{ $labels.namespace }} использует {{ $value | printf "%.2f" }}% CPU в течение последних 5 минут.
+          Возможно требуется масштабирование или оптимизация.
+    
+    # Алерт на высокое потребление памяти
+    - alert: HighMemoryUsage
+      expr: |
+        (
+          sum(container_memory_working_set_bytes{container!="",container!="POD"}) by (pod, namespace)
+          /
+          sum(container_spec_memory_limit_bytes{container!="",container!="POD"}) by (pod, namespace)
+        ) * 100 > 85
+      for: 3m
+      labels:
+        severity: warning
+        component: kubernetes
+      annotations:
+        summary: "Высокое потребление памяти в Pod'е {{ $labels.pod }}"
+        description: |
+          Pod {{ $labels.pod }} в namespace {{ $labels.namespace }} использует {{ $value | printf "%.2f" }}% памяти.
+          Текущее потребление близко к лимиту.
+    
+    # Алерт на частые перезапуски Pod'ов
+    - alert: PodCrashLooping
+      expr: |
+        rate(kube_pod_container_status_restarts_total[15m]) * 60 * 15 > 2
+      for: 5m
+      labels:
+        severity: critical
+        component: kubernetes
+      annotations:
+        summary: "Pod {{ $labels.pod }} часто перезапускается"
+        description: |
+          Pod {{ $labels.pod }} в namespace {{ $labels.namespace }} перезапускался {{ $value }} раз за последние 15 минут.
+          Проверьте логи и конфигурацию приложения.
+    
+    # Алерт на недоступность Pod'а
+    - alert: PodNotReady
+      expr: |
+        kube_pod_status_ready{condition="false"} == 1
+      for: 10m
+      labels:
+        severity: warning
+        component: kubernetes
+      annotations:
+        summary: "Pod {{ $labels.pod }} не готов"
+        description: |
+          Pod {{ $labels.pod }} в namespace {{ $labels.namespace }} находится в состоянии Not Ready более 10 минут.
+
+  # Группа алертов для мониторинг стека
+  - name: monitoring.rules
+    interval: 30s
+    rules:
+    
+    # Алерт на недоступность Prometheus target'а
+    - alert: PrometheusTargetDown
+      expr: up == 0
+      for: 2m
+      labels:
+        severity: critical
+        component: prometheus
+      annotations:
+        summary: "Prometheus target недоступен"
+        description: |
+          Target {{ $labels.instance }} job'а {{ $labels.job }} недоступен более 2 минут.
+          Проверьте состояние сервиса и сетевое подключение.
+    
+    # Алерт на проблемы с Grafana
+    - alert: GrafanaDown
+      expr: |
+        up{job=~".*grafana.*"} == 0
+      for: 5m
+      labels:
+        severity: critical
+        component: grafana
+      annotations:
+        summary: "Grafana недоступна"
+        description: |
+          Grafana недоступна более 5 минут. Дашборды мониторинга не работают.
+    
+    # Алерт на высокую нагрузку на Prometheus
+    - alert: PrometheusHighLoad
+      expr: |
+        rate(prometheus_engine_query_duration_seconds_sum[5m]) > 0.1
+      for: 10m
+      labels:
+        severity: warning
+        component: prometheus
+      annotations:
+        summary: "Высокая нагрузка на Prometheus"
+        description: |
+          Prometheus испытывает высокую нагрузку. Среднее время выполнения запросов: {{ $value | printf "%.3f" }}s
+
+  # Группа алертов для инфраструктуры
+  - name: infrastructure.rules
+    interval: 60s
+    rules:
+    
+    # Алерт на недостаток места на диске
+    - alert: NodeDiskSpaceRunningOut
+      expr: |
+        (
+          node_filesystem_avail_bytes{mountpoint="/",fstype!="tmpfs"} 
+          / 
+          node_filesystem_size_bytes{mountpoint="/",fstype!="tmpfs"}
+        ) * 100 < 15
+      for: 5m
+      labels:
+        severity: warning
+        component: node
+      annotations:
+        summary: "Заканчивается место на диске узла {{ $labels.instance }}"
+        description: |
+          Свободного места на диске: {{ $value | printf "%.2f" }}%
+          Узел: {{ $labels.instance }}
+    
+    # Алерт на высокую загрузку узла
+    - alert: NodeHighLoad
+      expr: |
+        node_load1 / count(count(node_cpu_seconds_total) by (cpu)) > 0.8
+      for: 10m
+      labels:
+        severity: warning
+        component: node
+      annotations:
+        summary: "Высокая загрузка узла {{ $labels.instance }}"
+        description: |
+          Load average: {{ $value | printf "%.2f" }}
+          Узел: {{ $labels.instance }}
+
+  # Группа алертов для сети
+  - name: networking.rules
+    interval: 30s
+    rules:
+    
+    # Алерт на недоступность Ingress
+    - alert: IngressDown
+      expr: |
+        up{job=~".*ingress.*"} == 0
+      for: 3m
+      labels:
+        severity: critical
+        component: ingress
+      annotations:
+        summary: "Ingress Controller недоступен"
+        description: |
+          Ingress Controller недоступен. Внешний доступ к приложениям может быть нарушен.
+    
+    # Алерт на высокий процент ошибок HTTP
+    - alert: HighHTTPErrorRate
+      expr: |
+        (
+          sum(rate(nginx_ingress_controller_requests{status=~"5.."}[5m])) by (ingress)
+          /
+          sum(rate(nginx_ingress_controller_requests[5m])) by (ingress)
+        ) * 100 > 5
+      for: 5m
+      labels:
+        severity: warning
+        component: ingress
+      annotations:
+        summary: "Высокий процент HTTP 5xx ошибок"
+        description: |
+          Ingress {{ $labels.ingress }} показывает {{ $value | printf "%.2f" }}% ошибок 5xx за последние 5 минут.

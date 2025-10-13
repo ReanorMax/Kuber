@@ -1,0 +1,45 @@
+# SSL сертификаты и приватные ключи (для безопасности)
+ssl-certs/*.key
+ssl-certs/*.crt
+*.key
+*.crt
+
+# Резервные копии
+*.backup.*
+*~
+
+# Логи и временные файлы
+*.log
+*.tmp
+.DS_Store
+Thumbs.db
+
+# IDE файлы
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Kubernetes секреты (если будут)
+*-secret.yaml
+*secret*.yaml
+
+# Локальные настройки
+local-config/
+.env
+.env.local
+
+# Helm временные файлы
+charts/*.tgz
+requirements.lock
+
+# Docker build контекст
+.dockerignore
+Dockerfile.local
+
+# Отчеты диагностики (могут содержать чувствительную информацию)
+cluster-diagnostics-*.log
+diagnostic-reports/
+
+# Временные скрипты
+temp-*.sh

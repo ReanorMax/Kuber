@@ -1,0 +1,91 @@
+# ServiceMonitor для автоматического discovery кастомных приложений
+
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: example-metrics-app-monitor
+  namespace: default
+  labels:
+    app: example-metrics-app
+    # ВАЖНО: label для discovery Prometheus Operator'ом
+    release: prometheus
+spec:
+  # Селектор для поиска Service'ов
+  selector:
+    matchLabels:
+      app: example-metrics-app
+  
+  # Endpoints для сбора метрик
+  endpoints:
+  - port: metrics        # Имя порта в Service
+    interval: 30s        # Частота сбора метрик
+    path: /metrics       # Путь к метрикам
+    scheme: http         # Протокол
+    
+    # Дополнительные метки для метрик
+    relabelings:
+    - sourceLabels: [__meta_kubernetes_pod_name]
+      targetLabel: pod_name
+    - sourceLabels: [__meta_kubernetes_pod_node_name]
+      targetLabel: node_name
+    - sourceLabels: [__meta_kubernetes_namespace]
+      targetLabel: kubernetes_namespace
+    
+    # Преобразование метрик
+    metricRelabelings:
+    - sourceLabels: [__name__]
+      regex: 'node_.*'
+      targetLabel: __tmp_instance_type
+      replacement: 'example_app'
+
+---
+# Дополнительный ServiceMonitor для системных метрик кластера
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: kubernetes-system-monitor
+  namespace: monitoring
+  labels:
+    app: kubernetes-system
+    release: prometheus
+spec:
+  jobLabel: k8s-app
+  
+  # Мониторинг системных сервисов в kube-system
+  namespaceSelector:
+    matchNames:
+    - kube-system
+  
+  selector:
+    matchLabels:
+      k8s-app: kube-dns
+  
+  endpoints:
+  - port: http-metrics
+    interval: 30s
+    path: /metrics
+
+---
+# ServiceMonitor для мониторинга Ingress Controller
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: ingress-nginx-monitor
+  namespace: monitoring
+  labels:
+    app: ingress-nginx
+    release: prometheus
+spec:
+  namespaceSelector:
+    matchNames:
+    - ingress-nginx
+  
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: ingress-nginx
+      app.kubernetes.io/component: controller
+  
+  endpoints:
+  - port: prometheus
+    interval: 30s
+    path: /metrics

@@ -1,0 +1,30 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: grafana-ingress-ssl
+  namespace: monitoring
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+    nginx.ingress.kubernetes.io/backend-protocol: "HTTP"
+    # SSL редирект  
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    # Принудительное использование HTTPS
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+    # Базовые заголовки безопасности (без snippets)
+spec:
+  ingressClassName: nginx
+  tls:
+  - hosts:
+    - grafana.local
+    secretName: monitoring-tls
+  rules:
+  - host: grafana.local
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: prometheus-grafana
+            port:
+              number: 80

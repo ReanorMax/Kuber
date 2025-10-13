@@ -1,0 +1,98 @@
+# Кастомные значения для kube-prometheus-stack
+# Используется для создания Ingress для Prometheus и улучшений
+
+# Prometheus конфигурация
+prometheus:
+  ingress:
+    enabled: true
+    ingressClassName: nginx
+    hosts:
+      - prometheus.local
+    paths:
+      - /
+    pathType: Prefix
+    tls: []
+  
+  prometheusSpec:
+    # Увеличиваем retention для обучения
+    retention: 30d
+    retentionSize: 10GiB
+    
+    # Добавляем дополнительные scrape configs для примеров
+    additionalScrapeConfigs: []
+
+# Grafana конфигурация  
+grafana:
+  # Административные настройки
+  adminPassword: admin123
+  
+  # Service конфигурация
+  service:
+    type: NodePort
+    nodePort: 31282
+  
+  # Ingress конфигурация с улучшениями
+  ingress:
+    enabled: true
+    ingressClassName: nginx
+    hosts:
+      - grafana.local
+    path: /
+    pathType: Prefix
+    tls: []
+  
+  # Дополнительные дашборды
+  dashboardProviders:
+    dashboardproviders.yaml:
+      apiVersion: 1
+      providers:
+      - name: 'custom-dashboards'
+        orgId: 1
+        folder: 'Custom'
+        type: file
+        disableDeletion: false
+        editable: true
+        options:
+          path: /var/lib/grafana/dashboards/custom
+  
+  # Persistence для дашбордов
+  persistence:
+    enabled: true
+    size: 1Gi
+
+# Alertmanager конфигурация
+alertmanager:
+  ingress:
+    enabled: true  
+    ingressClassName: nginx
+    hosts:
+      - alertmanager.local
+    paths:
+      - /
+    pathType: Prefix
+    tls: []
+    
+  alertmanagerSpec:
+    # Базовая конфигурация алертов для обучения
+    configSecret: alertmanager-config
+
+# Node Exporter - включаем дополнительные метрики
+nodeExporter:
+  enabled: true
+  
+# kube-state-metrics - дополнительные метрики  
+kubeStateMetrics:
+  enabled: true
+
+# Prometheus Operator
+prometheusOperator:
+  enabled: true
+  
+  # Дополнительные CRDs для обучения
+  manageCrds: true
+
+# Дополнительные ServiceMonitors для примеров
+additionalServiceMonitors: []
+
+# Дополнительные PrometheusRules для алертов
+additionalPrometheusRules: []

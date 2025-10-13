@@ -1,0 +1,376 @@
+# ConfigMap для автоматической загрузки кастомных дашбордов в Grafana
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: custom-dashboards
+  namespace: monitoring
+  labels:
+    grafana_dashboard: "1"
+    app: grafana
+data:
+  kubernetes-overview.json: |
+    {
+      "dashboard": {
+        "id": null,
+        "title": "Kubernetes Cluster Overview - Learning",
+        "tags": ["kubernetes", "cluster", "learning"],
+        "style": "dark",
+        "timezone": "browser",
+        "refresh": "30s",
+        "time": {
+          "from": "now-1h",
+          "to": "now"
+        },
+        "panels": [
+          {
+            "id": 1,
+            "title": "Cluster Nodes Status",
+            "type": "stat",
+            "gridPos": {"h": 4, "w": 6, "x": 0, "y": 0},
+            "targets": [
+              {
+                "expr": "count(kube_node_info)",
+                "legendFormat": "Total Nodes",
+                "refId": "A"
+              },
+              {
+                "expr": "count(kube_node_status_condition{condition=\"Ready\", status=\"true\"})",
+                "legendFormat": "Ready Nodes",
+                "refId": "B"
+              }
+            ],
+            "fieldConfig": {
+              "defaults": {
+                "color": {"mode": "palette-classic"},
+                "unit": "short"
+              }
+            }
+          },
+          {
+            "id": 2,
+            "title": "Pods by Status",
+            "type": "piechart",
+            "gridPos": {"h": 8, "w": 8, "x": 6, "y": 0},
+            "targets": [
+              {
+                "expr": "count(kube_pod_status_phase{phase=\"Running\"})",
+                "legendFormat": "Running",
+                "refId": "A"
+              },
+              {
+                "expr": "count(kube_pod_status_phase{phase=\"Pending\"})",
+                "legendFormat": "Pending",
+                "refId": "B"
+              },
+              {
+                "expr": "count(kube_pod_status_phase{phase=\"Failed\"})",
+                "legendFormat": "Failed",
+                "refId": "C"
+              }
+            ]
+          },
+          {
+            "id": 3,
+            "title": "CPU Usage by Node",
+            "type": "timeseries",
+            "gridPos": {"h": 8, "w": 10, "x": 14, "y": 0},
+            "targets": [
+              {
+                "expr": "100 - (avg(rate(node_cpu_seconds_total{mode=\"idle\"}[5m])) by (instance) * 100)",
+                "legendFormat": "{{instance}}",
+                "refId": "A"
+              }
+            ],
+            "fieldConfig": {
+              "defaults": {
+                "color": {"mode": "palette-classic"},
+                "unit": "percent",
+                "min": 0,
+                "max": 100
+              }
+            }
+          },
+          {
+            "id": 4,
+            "title": "Memory Usage by Namespace",
+            "type": "bargauge",
+            "gridPos": {"h": 8, "w": 12, "x": 0, "y": 8},
+            "targets": [
+              {
+                "expr": "sum(container_memory_working_set_bytes{container!=\"POD\",container!=\"\"}) by (namespace)",
+                "legendFormat": "{{namespace}}",
+                "refId": "A"
+              }
+            ],
+            "fieldConfig": {
+              "defaults": {
+                "color": {"mode": "palette-classic"},
+                "unit": "bytes"
+              }
+            }
+          },
+          {
+            "id": 5,
+            "title": "Network Traffic",
+            "type": "timeseries",
+            "gridPos": {"h": 8, "w": 12, "x": 12, "y": 8},
+            "targets": [
+              {
+                "expr": "sum(rate(node_network_receive_bytes_total{device!=\"lo\"}[5m]))",
+                "legendFormat": "Receive",
+                "refId": "A"
+              },
+              {
+                "expr": "sum(rate(node_network_transmit_bytes_total{device!=\"lo\"}[5m]))",
+                "legendFormat": "Transmit",
+                "refId": "B"
+              }
+            ],
+            "fieldConfig": {
+              "defaults": {
+                "color": {"mode": "palette-classic"},
+                "unit": "binBps"
+              }
+            }
+          }
+        ],
+        "templating": {
+          "list": []
+        },
+        "annotations": {
+          "list": []
+        },
+        "editable": true,
+        "gnetId": null,
+        "graphTooltip": 0,
+        "hideControls": false,
+        "links": [],
+        "schemaVersion": 16,
+        "version": 1
+      }
+    }
+
+  monitoring-stack.json: |
+    {
+      "dashboard": {
+        "id": null,
+        "title": "Monitoring Stack Health - Learning",
+        "tags": ["prometheus", "grafana", "monitoring", "learning"],
+        "style": "dark",
+        "timezone": "browser",
+        "refresh": "30s",
+        "time": {
+          "from": "now-1h",
+          "to": "now"
+        },
+        "panels": [
+          {
+            "id": 1,
+            "title": "Prometheus Targets Status",
+            "type": "stat",
+            "gridPos": {"h": 4, "w": 8, "x": 0, "y": 0},
+            "targets": [
+              {
+                "expr": "count(up)",
+                "legendFormat": "Total Targets",
+                "refId": "A"
+              },
+              {
+                "expr": "count(up == 1)",
+                "legendFormat": "Up Targets",
+                "refId": "B"
+              },
+              {
+                "expr": "count(up == 0)",
+                "legendFormat": "Down Targets",
+                "refId": "C"
+              }
+            ],
+            "fieldConfig": {
+              "defaults": {
+                "color": {"mode": "palette-classic"},
+                "unit": "short"
+              }
+            }
+          },
+          {
+            "id": 2,
+            "title": "Prometheus TSDB Status",
+            "type": "timeseries",
+            "gridPos": {"h": 8, "w": 12, "x": 8, "y": 0},
+            "targets": [
+              {
+                "expr": "prometheus_tsdb_head_series",
+                "legendFormat": "Head Series",
+                "refId": "A"
+              },
+              {
+                "expr": "rate(prometheus_tsdb_head_samples_appended_total[5m])",
+                "legendFormat": "Samples Appended Rate",
+                "refId": "B"
+              }
+            ]
+          },
+          {
+            "id": 3,
+            "title": "Grafana HTTP Requests",
+            "type": "timeseries",
+            "gridPos": {"h": 8, "w": 12, "x": 0, "y": 8},
+            "targets": [
+              {
+                "expr": "sum(rate(grafana_http_request_total[5m])) by (statuscode)",
+                "legendFormat": "{{statuscode}}",
+                "refId": "A"
+              }
+            ]
+          },
+          {
+            "id": 4,
+            "title": "Query Duration",
+            "type": "timeseries",
+            "gridPos": {"h": 8, "w": 12, "x": 12, "y": 8},
+            "targets": [
+              {
+                "expr": "histogram_quantile(0.95, rate(prometheus_engine_query_duration_seconds_bucket[5m]))",
+                "legendFormat": "95th percentile",
+                "refId": "A"
+              },
+              {
+                "expr": "histogram_quantile(0.50, rate(prometheus_engine_query_duration_seconds_bucket[5m]))",
+                "legendFormat": "50th percentile",
+                "refId": "B"
+              }
+            ],
+            "fieldConfig": {
+              "defaults": {
+                "unit": "s"
+              }
+            }
+          }
+        ],
+        "templating": {
+          "list": []
+        },
+        "annotations": {
+          "list": []
+        },
+        "editable": true,
+        "gnetId": null,
+        "graphTooltip": 0,
+        "hideControls": false,
+        "links": [],
+        "schemaVersion": 16,
+        "version": 1
+      }
+    }
+
+---
+# Дополнительный ConfigMap с примером простого дашборда для обучения
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: learning-dashboard
+  namespace: monitoring
+  labels:
+    grafana_dashboard: "1"
+    app: grafana
+data:
+  learning-basics.json: |
+    {
+      "dashboard": {
+        "id": null,
+        "title": "Learning Dashboard - First Steps",
+        "tags": ["learning", "basic", "prometheus"],
+        "style": "dark",
+        "timezone": "browser",
+        "refresh": "5s",
+        "time": {
+          "from": "now-30m",
+          "to": "now"
+        },
+        "panels": [
+          {
+            "id": 1,
+            "title": "Up Targets (Basic Query)",
+            "type": "stat",
+            "gridPos": {"h": 4, "w": 6, "x": 0, "y": 0},
+            "targets": [
+              {
+                "expr": "up",
+                "legendFormat": "{{job}} - {{instance}}",
+                "refId": "A"
+              }
+            ],
+            "description": "Basic Prometheus query showing which targets are up (1) or down (0)"
+          },
+          {
+            "id": 2,
+            "title": "Rate Function Example",
+            "type": "timeseries",
+            "gridPos": {"h": 8, "w": 12, "x": 6, "y": 0},
+            "targets": [
+              {
+                "expr": "rate(prometheus_http_requests_total[5m])",
+                "legendFormat": "HTTP Requests/sec",
+                "refId": "A"
+              }
+            ],
+            "description": "Example of rate() function - shows HTTP requests per second over 5 minute window"
+          },
+          {
+            "id": 3,
+            "title": "Sum by Example",
+            "type": "timeseries",
+            "gridPos": {"h": 8, "w": 12, "x": 0, "y": 4},
+            "targets": [
+              {
+                "expr": "sum by (job) (up)",
+                "legendFormat": "{{job}}",
+                "refId": "A"
+              }
+            ],
+            "description": "Example of sum by() - groups targets by job and counts how many are up"
+          },
+          {
+            "id": 4,
+            "title": "Node Memory Available",
+            "type": "timeseries", 
+            "gridPos": {"h": 8, "w": 12, "x": 12, "y": 4},
+            "targets": [
+              {
+                "expr": "node_memory_MemAvailable_bytes / 1024 / 1024 / 1024",
+                "legendFormat": "Available Memory GB",
+                "refId": "A"
+              }
+            ],
+            "fieldConfig": {
+              "defaults": {
+                "unit": "short"
+              }
+            },
+            "description": "Memory available in GB (converted from bytes)"
+          }
+        ],
+        "templating": {
+          "list": []
+        },
+        "annotations": {
+          "list": []
+        },
+        "editable": true,
+        "gnetId": null,
+        "graphTooltip": 0,
+        "hideControls": false,
+        "links": [
+          {
+            "title": "Prometheus Query Documentation",
+            "url": "https://prometheus.io/docs/prometheus/latest/querying/basics/",
+            "type": "link",
+            "icon": "external link"
+          }
+        ],
+        "schemaVersion": 16,
+        "version": 1
+      }
+    }
