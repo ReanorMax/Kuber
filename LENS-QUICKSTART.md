@@ -1,5 +1,7 @@
 # 🚀 Быстрый старт с Lens для Windows
 
+> 📚 **Навигация**: [← Назад к INDEX](docs/INDEX.md) | [🏠 Главная](README.md) | [🔐 SSH туннель подробно](docs/ssh-tunnel-explained.md) | [🖥️ Lens детальная настройка](docs/lens-setup-guide.md)
+
 ## 📝 Что нужно сделать (3 шага)
 
 ### Шаг 1: Установить Lens на Windows
