@@ -1,0 +1,36 @@
+# Kind кластер с простым внешним доступом
+kind: Cluster
+apiVersion: kind.x-k8s.io/v1alpha4
+name: learning-cluster
+
+# Настройка сети для простого доступа
+networking:
+  # Отключаем проблемные сетевые политики  
+  disableDefaultCNI: false
+  podSubnet: "10.244.0.0/16"
+  serviceSubnet: "10.96.0.0/12"
+
+nodes:
+- role: control-plane
+  # Проброс портов для прямого доступа к сервисам
+  extraPortMappings:
+  - containerPort: 30080  # Grafana
+    hostPort: 3000
+    protocol: TCP
+  - containerPort: 30090  # Prometheus  
+    hostPort: 9090
+    protocol: TCP
+  - containerPort: 30093  # Alertmanager
+    hostPort: 9093
+    protocol: TCP
+  - containerPort: 80     # Ingress HTTP
+    hostPort: 8080
+    protocol: TCP
+  - containerPort: 443    # Ingress HTTPS
+    hostPort: 8443
+    protocol: TCP
+
+# Дополнительные фичи для обучения
+featureGates:
+  "EphemeralContainers": true
+  "LocalStorageCapacityIsolation": true

@@ -1,0 +1,170 @@
+# Пример приложения с кастомными метриками для Prometheus
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: example-metrics-app
+  namespace: default
+  labels:
+    app: example-metrics-app
+    version: v1.0
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: example-metrics-app
+  template:
+    metadata:
+      labels:
+        app: example-metrics-app
+        version: v1.0
+      annotations:
+        # Prometheus annotations для автоматического discovery
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "8080"
+        prometheus.io/path: "/metrics"
+    spec:
+      containers:
+      - name: metrics-app
+        image: prom/node-exporter:v1.6.1
+        ports:
+        - containerPort: 9100
+          name: metrics
+        resources:
+          requests:
+            cpu: 50m
+            memory: 64Mi
+          limits:
+            cpu: 100m
+            memory: 128Mi
+        env:
+        - name: NODE_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: spec.nodeName
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: POD_NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+      
+      # Sidecar контейнер с простым веб-сервером для демонстрации
+      - name: web-server
+        image: nginx:1.20-alpine
+        ports:
+        - containerPort: 80
+          name: http
+        resources:
+          requests:
+            cpu: 25m
+            memory: 32Mi
+          limits:
+            cpu: 50m
+            memory: 64Mi
+        volumeMounts:
+        - name: html-content
+          mountPath: /usr/share/nginx/html
+      volumes:
+      - name: html-content
+        configMap:
+          name: example-app-html
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: example-app-html
+  namespace: default
+data:
+  index.html: |
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <title>Example Metrics App</title>
+        <style>
+            body { font-family: Arial; margin: 40px; background: #f5f5f5; }
+            .container { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+            .metric { background: #e3f2fd; padding: 10px; margin: 10px 0; border-radius: 4px; }
+            .status { color: #4caf50; font-weight: bold; }
+        </style>
+        <script>
+            function updateMetrics() {
+                document.getElementById('timestamp').textContent = new Date().toLocaleString();
+                document.getElementById('hostname').textContent = window.location.hostname;
+                document.getElementById('random').textContent = Math.floor(Math.random() * 100);
+            }
+            setInterval(updateMetrics, 5000);
+            window.onload = updateMetrics;
+        </script>
+    </head>
+    <body>
+        <div class="container">
+            <h1>🎯 Example Metrics Application</h1>
+            <div class="status">✅ Status: Running</div>
+            
+            <div class="metric">
+                <strong>Pod Hostname:</strong> <span id="hostname"></span>
+            </div>
+            
+            <div class="metric">
+                <strong>Last Update:</strong> <span id="timestamp"></span>
+            </div>
+            
+            <div class="metric">
+                <strong>Random Metric:</strong> <span id="random"></span>
+            </div>
+            
+            <div class="metric">
+                <strong>Metrics Endpoint:</strong> 
+                <a href="/metrics" target="_blank">http://localhost:9100/metrics</a>
+            </div>
+            
+            <p><em>Это демо-приложение для изучения мониторинга в Kubernetes. 
+            Метрики собираются node-exporter'ом и отправляются в Prometheus.</em></p>
+        </div>
+    </body>
+    </html>
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: example-metrics-app-service
+  namespace: default
+  labels:
+    app: example-metrics-app
+spec:
+  selector:
+    app: example-metrics-app
+  ports:
+  - port: 80
+    targetPort: 80
+    name: http
+  - port: 9100
+    targetPort: 9100
+    name: metrics
+
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: example-metrics-app-ingress
+  namespace: default
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: metrics-app.local
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: example-metrics-app-service
+            port:
+              number: 80

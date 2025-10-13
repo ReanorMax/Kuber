@@ -1,0 +1,5 @@
+USER-SUPPLIED VALUES:
+grafana:
+  adminPassword: admin123
+  service:
+    type: NodePort
