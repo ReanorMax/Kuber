@@ -23,6 +23,9 @@ nodes:
   - containerPort: 30093  # Alertmanager
     hostPort: 9093
     protocol: TCP
+  - containerPort: 30443  # Kubernetes Dashboard
+    hostPort: 30443
+    protocol: TCP
   - containerPort: 80     # Ingress HTTP
     hostPort: 8080
     protocol: TCP

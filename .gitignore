@@ -44,3 +44,9 @@ diagnostic-reports/
 # Временные скрипты
 temp-*.sh
 .github-auth-help.md
+
+# Kubeconfig и токены (содержат приватные ключи)
+kubeconfig-for-windows.yaml
+dashboard-admin-token.txt
+dashboard-token.txt
+*.kubeconfig
