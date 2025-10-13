@@ -77,10 +77,10 @@ kind create cluster --config kind-config.yaml
 
 После настройки будут доступны:
 
-- 📊 **Grafana**: https://grafana.local (admin/admin123)
-- 📈 **Prometheus**: https://prometheus.local  
-- 🚨 **Alertmanager**: https://alertmanager.local
-- 🎯 **Example App**: http://metrics-app.local
+- 📊 **Grafana**: http://10.19.1.209:3000 (admin/admin123) ✅
+- 📈 **Prometheus**: http://10.19.1.209:9090 ✅
+- 🚨 **Alertmanager**: http://10.19.1.209:9093 ✅
+- 🎯 **Example App**: http://10.19.1.209:8080 ✅
 
 ### 🖥️ GUI инструменты для управления
 
@@ -138,6 +138,17 @@ kind create cluster --config kind-config.yaml
 - Анализировать логи и события
 - Отлаживать сетевые проблемы
 - Использовать инструменты мониторинга
+
+### 🚨 Полное руководство по решению проблем
+**Файл**: [`docs/troubleshooting-complete-guide.md`](docs/troubleshooting-complete-guide.md)
+
+**ВСЕ ПРОБЛЕМЫ И РЕШЕНИЯ**:
+- ✅ Высокая нагрузка на сервер (Minikube + Kind)
+- ✅ Grafana Health Check Failures
+- ✅ Dashboard неактивная кнопка Sign In
+- ✅ Dashboard показывает только 2 пода
+- ✅ Port-forward не работает
+- 📊 **Актуальные данные для доступа** ко всем сервисам
 
 ## 🏗️ Архитектура проекта
 
@@ -231,17 +242,17 @@ kubectl get prometheusrules -n monitoring
 
 ## 🌐 Доступ к сервисам
 
-### Внешний доступ (через Ingress)
+### 🌐 Прямой доступ (Kind порты) - РЕКОМЕНДУЕТСЯ
+- **Grafana**: http://10.19.1.209:3000 (admin/admin123) ✅
+- **Prometheus**: http://10.19.1.209:9090 ✅
+- **Alertmanager**: http://10.19.1.209:9093 ✅
+- **Kubernetes Dashboard**: http://10.19.1.209:8001/api/v1/namespaces/kubernetes-dashboard/services/https:kubernetes-dashboard:/proxy/ ✅
+
+### 🔒 Внешний доступ (через Ingress) - ДОПОЛНИТЕЛЬНО
 - **Grafana**: https://grafana.local (admin/admin123)
 - **Prometheus**: https://prometheus.local
 - **Alertmanager**: https://alertmanager.local
 - **Example App**: http://metrics-app.local
-
-### Прямой доступ (Kind порты)
-- **Grafana**: http://10.19.1.209:3000
-- **Prometheus**: http://10.19.1.209:9090
-- **Alertmanager**: http://10.19.1.209:9093
-- **Dashboard**: https://10.19.1.209:9443
 
 ### SSH туннель (для Lens)
 ```bash
@@ -250,7 +261,27 @@ ssh -L 6443:127.0.0.1:41917 root@10.19.1.209 -N
 
 ## 🛠️ Troubleshooting
 
-### Частые проблемы
+### 🚨 Все проблемы и решения
+**📚 Полное руководство**: [`docs/troubleshooting-complete-guide.md`](docs/troubleshooting-complete-guide.md)
+
+### ⚡ Быстрые решения
+
+**Проблема**: Grafana показывает "Unhealthy"
+```bash
+# Проверка ресурсов сервера
+free -h
+docker stats --no-stream
+
+# Если память >90% - остановите неиспользуемые контейнеры
+docker stop $(docker ps -q)
+```
+
+**Проблема**: Dashboard кнопка "Sign in" неактивна
+```bash
+# Используйте kubectl proxy вместо port-forward
+kubectl proxy --address='0.0.0.0' --port=8001
+# URL: http://10.19.1.209:8001/api/v1/namespaces/kubernetes-dashboard/services/https:kubernetes-dashboard:/proxy/
+```
 
 **Проблема**: Сервисы недоступны
 ```bash
@@ -259,25 +290,6 @@ kubectl get pods --all-namespaces
 
 # Проверка сервисов
 kubectl get svc --all-namespaces
-
-# Проверка Ingress
-kubectl get ingress --all-namespaces
-```
-
-**Проблема**: Dashboard не открывается
-```bash
-# Перезапуск port-forward
-pkill -f "port-forward.*kubernetes-dashboard"
-./scripts/access-dashboard.sh
-```
-
-**Проблема**: Метрики не собираются
-```bash
-# Проверка ServiceMonitors
-kubectl get servicemonitors -n monitoring
-
-# Проверка targets в Prometheus
-# Откройте https://prometheus.local/targets
 ```
 
 ## 📚 Дополнительные ресурсы
