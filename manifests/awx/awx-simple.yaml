@@ -1,0 +1,37 @@
+---
+apiVersion: awx.ansible.com/v1beta1
+kind: AWX
+metadata:
+  name: awx
+  namespace: awx
+spec:
+  # Минимальная конфигурация для Kind
+  service_type: NodePort
+  nodeport_port: 30800
+  hostname: awx.local
+  
+  # Минимальные ресурсы
+  web_resource_requirements:
+    requests:
+      cpu: 25m
+      memory: 64Mi
+    limits:
+      cpu: 200m
+      memory: 512Mi
+  
+  task_resource_requirements:
+    requests:
+      cpu: 25m
+      memory: 64Mi
+    limits:
+      cpu: 200m
+      memory: 512Mi
+  
+  postgres_resource_requirements:
+    requests:
+      cpu: 25m
+      memory: 64Mi
+    limits:
+      cpu: 100m
+      memory: 256Mi
+

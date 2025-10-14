@@ -110,6 +110,14 @@
   - Основные команды
   - ➡️ **Детали в**: [gui-tools-comparison.md](gui-tools-comparison.md)
 
+### Автоматизация и развертывание:
+- [awx-deployment-guide.md](awx-deployment-guide.md) - **AWX: Платформа автоматизации Ansible** ⭐
+  - Развертывание AWX в Kubernetes
+  - Управление playbooks и инвентарем
+  - Развертывание на внешние сервера
+  - Job Templates и Credentials
+  - ➡️ **Читать после**: [Урок 3](learning-guide-03-advanced-topics.md)
+
 - [lens-setup-guide.md](lens-setup-guide.md) - **Подробная настройка Lens**
   - Установка
   - Подключение к кластеру

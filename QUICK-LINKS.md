@@ -48,6 +48,7 @@
 - **Grafana**: http://10.19.1.209:3000 (admin/admin123)
 - **Prometheus**: http://10.19.1.209:9090
 - **Alertmanager**: http://10.19.1.209:9093
+- **AWX**: http://10.19.1.209:30800 (admin/AWXadmin123!) ⏳
 - **Dashboard**: http://10.19.1.209:8001/api/v1/namespaces/kubernetes-dashboard/services/https:kubernetes-dashboard:/proxy/
 
 ### **Токены**:
@@ -73,6 +74,7 @@ kubectl -n kubernetes-dashboard create token dashboard-admin
 ### **Доступ к сервисам**:
 ```bash
 ./scripts/access-dashboard.sh      # Kubernetes Dashboard
+./scripts/awx-access.sh           # AWX Platform
 ./scripts/fast-dashboard-access.sh  # Оптимизированный доступ
 ```
 
