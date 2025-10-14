@@ -21,6 +21,7 @@
 ## 🔧 **Практика**
 - [🔍 Как проверять переменные окружения](docs/how-to-check-env-variables.md)
 - [📦 ConfigMaps - что это и зачем](docs/configmaps-explained.md) ⭐
+- [🎯 AWX в Kubernetes - деплой на серверы](docs/awx-deployment-guide.md) ⭐
 - [🌐 Проброс портов - как это работает](docs/port-forwarding-explained.md)
 - [📊 Визуальная диаграмма портов](docs/port-mapping-diagram.md)
 - [🔐 SSH туннель для Kubernetes](docs/ssh-tunnel-explained.md)
@@ -105,6 +106,7 @@ kubectl -n kubernetes-dashboard create token dashboard-admin
 |------|----------|
 | **Pods и контейнеры** | [pods-vs-containers-explained.md](docs/pods-vs-containers-explained.md) |
 | **ConfigMaps** | [configmaps-explained.md](docs/configmaps-explained.md) |
+| **AWX/Ansible** | [awx-deployment-guide.md](docs/awx-deployment-guide.md) |
 | **Prometheus** | [prometheus-stack-components.md](docs/prometheus-stack-components.md) |
 | **Сеть и порты** | [port-forwarding-explained.md](docs/port-forwarding-explained.md) |
 | **SSH туннель** | [ssh-tunnel-explained.md](docs/ssh-tunnel-explained.md) |

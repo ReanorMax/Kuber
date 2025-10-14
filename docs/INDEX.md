@@ -90,6 +90,14 @@
   - Практические задания
   - ➡️ **Связано с**: [prometheus-stack-components.md](prometheus-stack-components.md)
 
+- [awx-deployment-guide.md](awx-deployment-guide.md) - **AWX в Kubernetes для деплоя на серверы** ⭐
+  - Можно ли деплоить на внешние серверы? (ДА!)
+  - Установка AWX через Operator
+  - Настройка SSH ключей и Inventory
+  - Как AWX из K8s подключается к серверам
+  - Практический пример деплоя
+  - ➡️ **Продвинутое использование**: Автоматизация инфраструктуры
+
 ### GUI инструменты:
 - [gui-tools-comparison.md](gui-tools-comparison.md) - **Сравнение GUI инструментов**
   - Lens (Desktop) - рекомендуется
