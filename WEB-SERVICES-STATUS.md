@@ -112,7 +112,8 @@ curl -I http://10.19.1.209:30090
 ### **🚀 Kafka**
 - **Bootstrap Server**: kafka.kafka.svc.cluster.local:9092
 - **Namespace**: kafka
-- **Статус**: Требует настройки (Pod падает)
+- **Статус**: ❌ Недоступен (CrashLoopBackOff)
+- **Примечание**: См. [KAFKA-TROUBLESHOOTING.md](./KAFKA-TROUBLESHOOTING.md)
 
 ---
 
