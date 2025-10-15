@@ -58,12 +58,18 @@ pkill -f "kubectl port-forward"
 pkill -f "kubectl port-forward.*grafana"
 ```
 
+### **Создание kubeconfig для Lens:**
+```bash
+./scripts/create-lens-kubeconfig.sh
+```
+
 ## 📚 **Документация**
 
 ### **Основные файлы:**
 - `LEARNING-INDEX.md` - Главный индекс для изучения
 - `WEB-SERVICES-STATUS.md` - Статус всех сервисов
 - `PORT-FORWARDING-COMPLETE-GUIDE.md` - Полное руководство по пробросу портов
+- `LENS-KUBECONFIG-GUIDE.md` - Подробная инструкция по настройке Lens
 - `COMPLETE-LEARNING-ENVIRONMENT.md` - Общее руководство
 
 ### **Специализированные гайды:**

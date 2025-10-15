@@ -14,6 +14,7 @@
 ### **🔧 Управление кластером**
 - **[WEB-SERVICES-STATUS.md](./WEB-SERVICES-STATUS.md)** - Текущий статус всех веб-сервисов
 - **[PORT-FORWARDING-COMPLETE-GUIDE.md](./PORT-FORWARDING-COMPLETE-GUIDE.md)** - Полное руководство по пробросу портов
+- **[LENS-KUBECONFIG-GUIDE.md](./LENS-KUBECONFIG-GUIDE.md)** - Подробная инструкция по настройке Lens
 - **[COMPLETE-LEARNING-ENVIRONMENT.md](./COMPLETE-LEARNING-ENVIRONMENT.md)** - Общее руководство по среде обучения
 
 ### **🗄️ Работа с данными**
